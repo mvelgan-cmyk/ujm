@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRO Батьків — спільнота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FBF6EF; --paper:#FFFFFF; --ink:#2A2233; --muted:#6E6577; --line:#E9E0D4;
+  --coral:#EE6A4D; --coral-soft:#FCE3DC; --plum:#5A3D8A; --plum-soft:#ECE5F7;
+  --sage:#4F9A7E; --sage-soft:#DFF0E8; --sun:#F4B740; --sun-soft:#FDF0D3; --tg:#2AABEE; --tg-soft:#DDF1FC;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#1E1828;font-family:'Manrope',system-ui,sans-serif;color:var(--ink);overflow:hidden}
+#viewport{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;position:relative;transform-origin:center center;flex:none}
+.slide{position:absolute;inset:0;background:var(--bg);border-radius:18px;padding:64px 72px;display:none;flex-direction:column;overflow:hidden}
+.slide.active{display:flex;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h1,h2,h3{font-family:'Unbounded',sans-serif;font-weight:700;letter-spacing:-.01em}
+h1{font-size:64px;line-height:1.05}
+h2{font-size:38px;line-height:1.15;margin-bottom:10px}
+h3{font-size:19px;line-height:1.25;font-weight:500}
+.kicker{font-size:14px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+.lead{font-size:21px;line-height:1.45;color:var(--muted);max-width:900px}
+p,li{font-size:18px;line-height:1.5}
+.grow{flex:1;display:flex;flex-direction:column;justify-content:center}
+.row.grow{flex-direction:row}
+.row{display:flex;gap:20px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:22px 24px;flex:1}
+.card p{font-size:16px;color:var(--muted);margin-top:8px}
+.tag{display:inline-block;font-size:13px;font-weight:700;padding:5px 11px;border-radius:99px;margin-bottom:12px}
+.big{font-family:'Unbounded';font-size:34px;font-weight:700}
+.foot{position:absolute;left:72px;right:72px;bottom:26px;display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+/* title */
+.s-title{background:var(--plum);color:#fff}
+.s-title .kicker{color:var(--sun)}
+.s-title .lead{color:#E3D9F3}
+.blob{position:absolute;border-radius:50%;filter:blur(2px)}
+/* compare */
+.col-h{font-family:'Unbounded';font-size:16px;margin-bottom:14px}
+.cmp li{list-style:none;padding:12px 0;border-bottom:1px dashed var(--line);font-size:18px;display:flex;gap:12px}
+.cmp li:last-child{border:none}
+.arrow{font-family:'Unbounded';font-size:40px;color:var(--coral);align-self:center}
+/* quote cards */
+.q{font-size:17px;font-style:italic;color:var(--ink);line-height:1.45}
+.num{font-family:'Unbounded';font-size:26px;color:var(--coral);font-weight:700}
+/* flow */
+.node{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:22px;width:300px}
+.node h3{font-weight:700;margin-bottom:8px}
+.node ul{padding-left:18px}
+.node li{font-size:15.5px;line-height:1.5;color:var(--muted)}
+.conn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;color:var(--muted);font-weight:600;text-align:center}
+.conn .line{width:100%;height:2px;background:var(--ink);opacity:.35;position:relative;margin:8px 0}
+.conn .line:after{content:'';position:absolute;right:-2px;top:-5px;border:6px solid transparent;border-left:9px solid rgba(42,34,51,.55)}
+/* tiers */
+.tier{border-radius:20px;padding:30px;flex:1;display:flex;flex-direction:column}
+.tier .price{font-family:'Unbounded';font-size:44px;font-weight:700;margin:6px 0 18px}
+.tier li{list-style:none;padding:9px 0;font-size:17px;border-top:1px solid rgba(0,0,0,.08);display:flex;gap:10px}
+.yes:before{content:'✓';font-weight:800;color:var(--sage)}
+.no{color:#A79FB0}
+.no:before{content:'—';font-weight:800}
+/* cycle */
+.cycle{display:flex;gap:14px;align-items:stretch;position:relative;margin-top:26px}
+.step{flex:1;border-radius:18px;padding:22px;position:relative;background:var(--paper);border:1px solid var(--line)}
+.step .wk{font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.step h3{font-weight:700;font-size:20px;margin:8px 0 10px}
+.step p{font-size:15.5px;color:var(--muted);line-height:1.45}
+.step .who{margin-top:14px;font-size:13.5px;font-weight:700}
+.step.final{background:var(--coral);border-color:var(--coral);color:#fff}
+.step.final p,.step.final .wk{color:#FFE8E1}
+.track{height:6px;border-radius:6px;background:linear-gradient(90deg,var(--plum-soft),var(--coral));margin-top:18px}
+/* week */
+.days{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:24px}
+.day{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:20px;min-height:200px}
+.day .d{font-family:'Unbounded';font-size:15px;margin-bottom:12px}
+.day p{font-size:15.5px;color:var(--muted)}
+.day.live{background:var(--plum);color:#fff;border-color:var(--plum)}
+.day.live p{color:#E3D9F3}
+/* plan table */
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{text-align:left;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:6px 10px;border-bottom:2px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.35}
+td.f{font-weight:700;white-space:nowrap}
+tr.web td{background:var(--coral-soft)}
+.month{font-family:'Unbounded';font-size:17px;margin:0 0 8px}
+/* steps list */
+.num-list{counter-reset:n;list-style:none}
+.num-list li{counter-increment:n;position:relative;padding:0 0 14px 46px;font-size:17px}
+.num-list li:before{content:counter(n);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;background:var(--tg);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:15px}
+.note{background:var(--sun-soft);border-radius:14px;padding:14px 18px;font-size:15px;line-height:1.45;margin-top:10px}
+/* hyp */
+.hyp{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.hyp .card h3{font-weight:700;font-size:18px}
+.hyp .card .t{margin-top:12px;font-size:15px;font-weight:700;color:var(--sage)}
+/* timeline */
+.tl{position:relative;margin-top:40px;display:flex;justify-content:space-between}
+.tl:before{content:'';position:absolute;left:0;right:0;top:15px;height:3px;background:var(--line)}
+.tl .pt{position:relative;width:16%;text-align:left}
+.tl .dot{width:32px;height:32px;border-radius:50%;background:var(--paper);border:3px solid var(--plum);margin-bottom:14px}
+.tl .pt.hl .dot{background:var(--coral);border-color:var(--coral)}
+.tl .dt{font-family:'Unbounded';font-size:15px;margin-bottom:6px}
+.tl p{font-size:14.5px;color:var(--muted);line-height:1.4}
+/* nav */
+#nav{position:fixed;bottom:14px;right:18px;display:flex;gap:8px;align-items:center;z-index:5}
+#nav button{background:rgba(255,255,255,.12);color:#fff;border:none;width:38px;height:38px;border-radius:50%;font-size:18px;cursor:pointer}
+#nav button:hover{background:rgba(255,255,255,.25)}
+#count{color:#cfc6dc;font-size:13px;min-width:54px;text-align:center}
+#bar{position:fixed;left:0;top:0;height:3px;background:var(--coral);transition:width .3s;z-index:5}
+@media print{
+  html,body{overflow:visible;background:#fff}
+  #viewport{position:static;display:block}
+  #stage{transform:none!important}
+  .slide{display:flex!important;position:relative;page-break-after:always;border-radius:0;animation:none}
+  #nav,#bar{display:none}
+}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="viewport"><div id="stage">
+
+<!-- 1 -->
+<section class="slide s-title">
+  <div class="blob" style="width:420px;height:420px;background:#7A57B0;right:-90px;top:-110px"></div>
+  <div class="blob" style="width:260px;height:260px;background:var(--coral);right:160px;bottom:-120px;opacity:.9"></div>
+  <div class="grow" style="position:relative">
+    <div class="kicker">GoITeens · MVP 1 · листопад 2026 — січень 2027</div>
+    <h1>PRO Батьків<br>спільнота<br>в Telegram</h1>
+    <p class="lead" style="margin-top:26px;max-width:640px">Щотижня жива зустріч з експертами, готові слова для складних розмов і батьки, які проходять те саме. Без оцінок. Усе у вашому телефоні.</p>
+  </div>
+</section>
+
+<!-- 2 -->
+<section class="slide">
+  <div class="kicker">Що змінюємо</div>
+  <h2>З розсилки — у спільноту</h2>
+  <p class="lead">За 5 місяців PRO Батьків став якісним контентом, але працює як розсилка: подія раз на місяць і жодного зв'язку між вебінарами.</p>
+  <div class="row grow" style="align-items:center;margin-top:10px">
+    <div class="card"><div class="col-h" style="color:var(--muted)">Зараз</div>
+      <ul class="cmp"><li>1 вебінар на місяць</li><li>Батьки слухають і зникають</li><li>Лише батьки наших учнів</li><li>Записи розкидані по різних адресах</li><li>Усе безкоштовно, метрик немає</li></ul></div>
+    <div class="arrow">→</div>
+    <div class="card" style="border:2px solid var(--coral)"><div class="col-h" style="color:var(--coral)">MVP 1</div>
+      <ul class="cmp"><li>1 жива зустріч щотижня, сталий цикл</li><li>Один канал із гілками: ефіри, записи, розмови</li><li>Усі батьки дітей 5–17 років</li><li>Записи і шпаргалки в Telegram</li><li>Безкоштовно + клуб 390 грн/міс</li></ul></div>
+  </div>
+</section>
+
+<!-- 3 -->
+<section class="slide">
+  <div class="kicker">Дослідження: про що говорять українські батьки</div>
+  <h2>Батькам потрібні слова, алгоритм і підтримка для себе</h2>
+  <div class="row" style="margin-top:22px">
+    <div class="card"><span class="tag" style="background:var(--coral-soft);color:var(--coral)">Біль №1</span><p class="q">«Не робить нічого, просто не чує, сидить в телефоні»</p><p>Платного продукту на цей біль немає.</p></div>
+    <div class="card"><span class="tag" style="background:var(--plum-soft);color:var(--plum)">Підлітки</span><p class="q">«Ми не батьки, ми якісь звірі по її словам»</p><p>Треди на 200–400 відповідей і жодного платного продукту.</p></div>
+    <div class="card"><span class="tag" style="background:var(--sun-soft);color:#A0700E">Мотивація</span><p class="q">«Вчитися не хоче, всі уроки робить з ШІ»</p><p>Величезна тема, яку зараз забирають репетитори.</p></div>
+  </div>
+  <div class="row" style="margin-top:18px">
+    <div class="card"><span class="tag" style="background:var(--sage-soft);color:var(--sage)">Вигорання</span><p class="q">Батьки просять допомоги СОБІ</p></div>
+    <div class="card"><span class="tag" style="background:var(--coral-soft);color:var(--coral)">Mom-shaming</span><p class="q">«Не хочу порад і засудження мене як мами»</p></div>
+    <div class="card"><div class="num">37%</div><p>дітей зі значним стресом у 2025 році (у 2024 — 27%)</p></div>
+    <div class="card"><div class="num">54%</div><p>школярів за рік стикалися з кібербулінгом</p></div>
+  </div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="kicker">Обіцянка</div>
+  <h2 style="max-width:1000px">«Ви не самі. І ви не погані батьки»</h2>
+  <p class="lead">Ми не вчимо «правильно» виховувати, а знімаємо з батьків вантаж.</p>
+  <div class="row grow" style="align-items:center">
+    <div class="card" style="background:var(--plum-soft);border:none"><div class="big" style="color:var(--plum)">1</div><h3 style="font-weight:700;margin-top:10px">Жива зустріч щотижня</h3><p>Сталий ритм, як заняття дитини: середа, 19:00.</p></div>
+    <div class="card" style="background:var(--coral-soft);border:none"><div class="big" style="color:var(--coral)">2</div><h3 style="font-weight:700;margin-top:10px">Готові слова й інструменти</h3><p>Кожна зустріч дає 1 інструмент, який можна застосувати того ж вечора.</p></div>
+    <div class="card" style="background:var(--sage-soft);border:none"><div class="big" style="color:var(--sage)">3</div><h3 style="font-weight:700;margin-top:10px">Підтримка без оцінок</h3><p>Гілки за віком дитини, теги #простовислухайте і #хочупоради.</p></div>
+  </div>
+</section>
+
+<!-- 5 -->
+<section class="slide">
+  <div class="kicker" style="color:var(--tg)">Як це працює</div>
+  <h2>Один канал із гілками, без зайвих чатів</h2>
+  <div class="row grow" style="align-items:center;gap:0">
+    <div style="display:flex;flex-direction:column;gap:14px;width:250px">
+      <div class="node" style="width:auto;border-color:var(--tg);padding:18px"><span class="tag" style="background:var(--tg-soft);color:#167BB0">Безкоштовно</span><h3>Відкрита вітрина</h3><ul><li>Для нових батьків</li><li>Корисні пости</li><li>Вебінар місяця наживо</li><li>Кнопка «Вступити в клуб»</li></ul></div>
+      <div class="node" style="width:auto;padding:18px"><span class="tag" style="background:var(--sun-soft);color:#A0700E">Вхід один раз</span><h3>Бот</h3><ul><li>390 грн/міс, автоматично</li><li>Або промокод для батьків учнів</li></ul></div>
+    </div>
+    <div class="conn" style="max-width:110px"><span>доступ</span><div class="line"></div></div>
+    <div class="node" style="width:auto;flex:1;border-color:var(--coral);padding:22px 24px">
+      <span class="tag" style="background:var(--coral-soft);color:var(--coral)">Клуб · один чат</span><h3 style="font-size:21px">«PRO Батьків» — канал із гілками</h3>
+      <div class="row" style="gap:16px;margin-top:12px">
+        <div style="flex:1;background:var(--plum-soft);border-radius:14px;padding:14px 16px"><div style="font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--plum);margin-bottom:8px">Гілки від команди · читати</div>
+          <p style="font-size:16px;line-height:1.75">📣 Анонси і розклад<br>🎥 Ефіри і записи<br>📄 Шпаргалки і шаблони<br>🧭 Карта допомоги</p></div>
+        <div style="flex:1;background:var(--sage-soft);border-radius:14px;padding:14px 16px"><div style="font-size:12.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--sage);margin-bottom:8px">Гілки для розмов</div>
+          <p style="font-size:16px;line-height:1.75">🧸 Батьки 5–7 · 🎮 8–12 · 🎧 13–17<br>❓ Питання психологу<br>🌿 Вдих для батьків</p></div>
+      </div>
+      <p style="font-size:14.5px;color:var(--muted);margin-top:12px">Технічно це закрита група з гілками, налаштована як канал: у гілках команди пишуть лише адміни. Відкритий канал потрібен тільки новим батькам, учасники клубу живуть в одному чаті.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 6 -->
+<section class="slide">
+  <div class="kicker">Рівні доступу</div>
+  <h2>Два рівні: безкоштовний і клуб</h2>
+  <div class="row grow" style="align-items:stretch;margin-top:16px">
+    <div class="tier" style="background:var(--paper);border:1px solid var(--line)">
+      <h3 style="font-weight:700">Канал</h3><div class="price">0 грн</div>
+      <ul><li class="yes">Вебінар місяця з психологом наживо</li><li class="yes">Корисні пости і шпаргалки в каналі</li><li class="yes">Коментарі під постами</li><li class="no">Інші 3 зустрічі місяця</li><li class="no">Записи і бібліотека</li><li class="no">Гілки за віком дитини</li></ul>
+    </div>
+    <div class="tier" style="background:var(--plum);color:#fff">
+      <h3 style="font-weight:700;color:var(--sun)">Клуб</h3><div class="price">390 грн<span style="font-size:20px;font-weight:500"> / місяць</span></div>
+      <ul><li class="yes" style="border-color:rgba(255,255,255,.15)">Усі 4 живі зустрічі на місяць</li><li class="yes" style="border-color:rgba(255,255,255,.15)">Записи всіх ефірів і шпаргалки</li><li class="yes" style="border-color:rgba(255,255,255,.15)">Гілки 5–7, 8–12, 13–17</li><li class="yes" style="border-color:rgba(255,255,255,.15)">Запитання психологу</li><li class="yes" style="border-color:rgba(255,255,255,.15)">Автоматична оплата щомісяця, скасувати можна будь-коли</li></ul>
+      <div class="note" style="margin-top:auto;color:var(--ink)">Батьки учнів GoITeens — безкоштовно на весь час навчання, за промокодом</div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 -->
+<section class="slide">
+  <div class="kicker">Місячний цикл · щосереди о 19:00</div>
+  <h2>Формати сталі, теми щотижня різні</h2>
+  <p class="lead">Порядок форматів щомісяця однаковий: починаємо з кола, закінчуємо вебінаром. А тема кожної зустрічі — своя, з різних напрямів.</p>
+  <div class="cycle">
+    <div class="step"><div class="wk">Тиждень 1</div><h3>Батьківське коло</h3><p>Тематична розмова: батьки діляться досвідом, ведуча тримає рамку. Без порад і оцінок.</p><div class="who">Методистка + психолог · 45 хв</div></div>
+    <div class="step"><div class="wk">Тиждень 2</div><h3>Перекладач поколінь</h3><p>Пояснюємо світ дитини: Roblox, TikTok, ШІ, сленг. Що там відбувається і чому це важливо.</p><div class="who">Викладач GoITeens · 30–40 хв</div></div>
+    <div class="step"><div class="wk">Тиждень 3</div><h3>Слова, які працюють</h3><p>Практикум: готові фрази і сценарії розмови, відпрацьовані на прикладах батьків.</p><div class="who">Психолог · 45 хв</div></div>
+    <div class="step final"><div class="wk">Тиждень 4 · фінал</div><h3>Вебінар місяця</h3><p>Окрема тема з психологом + відповіді на запитання з гілки. Ефір відкритий для всіх.</p><div class="who">Психолог · 60 хв</div></div>
+  </div>
+  <div class="track"></div>
+  <p style="font-size:15px;color:var(--muted);margin-top:12px">Теми беремо з 5 напрямів: стосунки і розмови · розвиток і навчання · цифровий світ · сім'я і побут · батьки теж люди. В одному місяці всі 4 зустрічі — з різних напрямів. 5-та середа — без ефіру, аудіопрактика «Вдих».</p>
+</section>
+
+<!-- 8 -->
+<section class="slide">
+  <div class="kicker">Досвід батьків</div>
+  <h2>Тиждень у телефоні батьків</h2>
+  <div class="days">
+    <div class="day"><div class="d">Пн</div><p>Анонс зустрічі тижня і збір запитань до неї</p></div>
+    <div class="day live"><div class="d">Ср · 19:00</div><p>Жива зустріч у клубі. Вебінар місяця — ще й у каналі для всіх</p></div>
+    <div class="day"><div class="d">Чт</div><p>Запис + шпаргалка «3 думки + 1 інструмент»</p></div>
+    <div class="day"><div class="d">Пт</div><p>Пост «Що сказати дитині, коли…» у каналі</p></div>
+    <div class="day"><div class="d">Сб–Нд</div><p>Сімейне міні-завдання на 10 хвилин</p></div>
+  </div>
+  <p class="lead" style="margin-top:28px">Між ефірами батьки спілкуються в гілках за віком дитини, а модератор щодня ставить одне запитання для обговорення.</p>
+</section>
+
+<!-- 9 -->
+<section class="slide" style="padding-top:48px">
+  <div class="kicker">Контент-план</div>
+  <h2 style="font-size:32px">До кінця року</h2>
+  <div class="row" style="margin-top:12px;gap:28px">
+    <div style="flex:1">
+      <div class="month">Листопад</div>
+      <table><tr><th>Дата</th><th>Формат</th><th>Тема</th></tr>
+        <tr><td class="f">04.11</td><td>Коло</td><td>Що ми повторюємо за своїми батьками — і що хочемо робити інакше</td></tr>
+        <tr><td class="f">11.11</td><td>Перекладач</td><td>Roblox, Brawl Stars, Minecraft: що насправді відбувається в іграх</td></tr>
+        <tr><td class="f">18.11</td><td>Слова</td><td>Похвала, яка підтримує: що сказати замість «ти молодець»</td></tr>
+        <tr class="web"><td class="f">25.11</td><td><b>Вебінар</b></td><td>Страхи дитини, які батьки не помічають, — і як їх розгледіти</td></tr>
+      </table>
+    </div>
+    <div style="flex:1">
+      <div class="month">Грудень</div>
+      <table><tr><th>Дата</th><th>Формат</th><th>Тема</th></tr>
+        <tr><td class="f">02.12</td><td>Коло</td><td>Сімейні традиції: що тримає нас разом</td></tr>
+        <tr><td class="f">09.12</td><td>Перекладач</td><td>Сленг, меми і тренди: словник батьків 2026</td></tr>
+        <tr><td class="f">16.12</td><td>Слова</td><td>Як говорити про гроші й подарунки, коли дитина хоче «як у всіх»</td></tr>
+        <tr class="web"><td class="f">23.12</td><td><b>Вебінар</b></td><td>Як залишатися авторитетом, не будучи авторитарним</td></tr>
+      </table>
+    </div>
+  </div>
+  <p style="font-size:15px;color:var(--muted);margin-top:20px"><b style="color:var(--ink)">Січень (чернетка):</b> тато і мама в одній команді · ШІ в житті дитини · як сваритися, щоб не руйнувати · підліток і самооцінка. Наприкінці місяця батьки голосують за 2 теми з банку на наступний.</p>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="kicker" style="color:var(--tg)">Технічно</div>
+  <h2>Записи й оплата теж у Telegram</h2>
+  <div class="row grow" style="align-items:flex-start;margin-top:20px;gap:40px">
+    <div style="flex:1">
+      <h3 style="font-weight:700;margin-bottom:18px">Ефір → запис → бібліотека</h3>
+      <ol class="num-list">
+        <li>Ефір іде трансляцією в гілці «Ефіри і записи». Вебінар місяця — ще й у відкритій вітрині</li>
+        <li>Адмін вмикає запис: «Відео й аудіо» або «Лише аудіо»</li>
+        <li>Після ефіру файл сам приходить у «Збережене» адміна</li>
+        <li>Пересилаємо його в гілку «Ефіри і записи» з хештегами #листопад #коло</li>
+      </ol>
+    </div>
+    <div style="flex:1">
+      <h3 style="font-weight:700;margin-bottom:18px">Оплата через бота</h3>
+      <ol class="num-list">
+        <li>Бот у SendPulse + WayForPay з регулярними платежами</li>
+        <li>390 грн списуються з картки щомісяця автоматично</li>
+        <li>Після оплати бот дає посилання в клуб</li>
+        <li>Якщо оплата не пройшла, бот нагадує і закриває доступ</li>
+      </ol>
+      <div class="note">Підписки Telegram Stars не підходять: вони працюють лише для закритих каналів, а оплата йде в Stars, що незручно для бухгалтерії.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 -->
+<section class="slide">
+  <div class="kicker">Цінність для академії</div>
+  <h2>Клуб працює на утримання і на залучення</h2>
+  <div class="row grow" style="align-items:stretch;margin-top:10px">
+    <div class="card"><span class="tag" style="background:var(--plum-soft);color:var(--plum)">Утримання</span><h3 style="font-weight:700">Батьки учнів щотижня в контакті з академією</h3><p>Найбільший відтік припадає на перші 3 місяці, а причина «втрата зв'язку» зростає. Клуб тримає цей зв'язок і стає аргументом при продовженні.</p></div>
+    <div class="card"><span class="tag" style="background:var(--coral-soft);color:var(--coral)">Залучення</span><h3 style="font-weight:700">Нові батьки знайомляться з GoITeens через користь</h3><p>Пост → канал → відкритий вебінар → клуб → пробне заняття для дитини. На «Перекладачі поколінь» батьки бачать наших викладачів.</p></div>
+    <div class="card"><span class="tag" style="background:var(--sun-soft);color:#A0700E">Продажі</span><h3 style="font-weight:700">«Клуб за 390 грн/міс — у подарунок»</h3><p>Слайд у презентаціях усіх курсів і 30-секундний скрипт для менеджера. Жодна інша IT-школа такого не дає.</p></div>
+  </div>
+</section>
+
+<!-- 12 -->
+<section class="slide">
+  <div class="kicker">MVP 1 · що перевіряємо</div>
+  <h2>Чотири гіпотези, рішення — у лютому</h2>
+  <div class="hyp" style="margin-top:44px">
+    <div class="card"><h3>Батьки приходять щотижня</h3><p>Живі учасники і перегляди записів</p><div class="t">Відвідуваність не падає до 4-го тижня місяця</div></div>
+    <div class="card"><h3>Зовнішні батьки платять 390 грн</h3><p>Оплати і продовження</p><div class="t">≥ 50% оплатили 2-й місяць</div></div>
+    <div class="card"><h3>Клуб утримує учнів</h3><p>Retention учнів, чиї батьки в клубі, проти решти</p><div class="t">Різниця ≥ 5 п.п. за 3 місяці</div></div>
+    <div class="card"><h3>Спільнота живе між ефірами</h3><p>Повідомлення в гілках</p><div class="t">≥ 20% учасників пишуть щомісяця</div></div>
+  </div>
+  <p style="font-size:14px;color:var(--muted);margin-top:16px">Це стартові орієнтири: базових даних зараз немає, тож після першого місяця уточнюємо.</p>
+</section>
+
+<!-- 13 -->
+<section class="slide">
+  <div class="kicker">Запуск</div>
+  <h2>Від погодження до першої зустрічі — 3 тижні</h2>
+  <div class="tl" style="margin-top:130px">
+    <div class="pt"><div class="dot"></div><div class="dt">до 21.10</div><p>Погоджено модель, ціну, психолога і викладачів</p></div>
+    <div class="pt"><div class="dot"></div><div class="dt">до 24.10</div><p>Канал із гілками, відкрита вітрина, правила</p></div>
+    <div class="pt"><div class="dot"></div><div class="dt">до 28.10</div><p>Бот, оплата, промокоди, 5 записів у бібліотеці</p></div>
+    <div class="pt"><div class="dot"></div><div class="dt">30.10–03.11</div><p>Слайд у продажах, запрошення батьків учнів</p></div>
+    <div class="pt hl"><div class="dot"></div><div class="dt">04.11</div><p><b>Перша зустріч:</b> «Батьківське коло»</p></div>
+    <div class="pt"><div class="dot"></div><div class="dt">лютий 2027</div><p>Рішення за метриками MVP</p></div>
+  </div>
+</section>
+
+<!-- 14 -->
+<section class="slide s-title">
+  <div class="blob" style="width:340px;height:340px;background:var(--coral);left:-110px;bottom:-140px"></div>
+  <div class="grow" style="position:relative">
+    <div class="kicker">Що потрібно погодити</div>
+    <h1 style="font-size:48px;margin-bottom:28px">Чотири рішення,<br>щоб стартувати 4.11</h1>
+    <ul style="list-style:none;font-size:21px;line-height:1.9;color:#F1EBFA">
+      <li>— Модель «канал + клуб» і ціна 390 грн/міс з автоматичною оплатою</li>
+      <li>— Безкоштовний клуб для батьків учнів на весь час навчання</li>
+      <li>— Платіжне рішення для бота (WayForPay або те, що вже використовує академія)</li>
+      <li>— Психолог на 2 зустрічі на місяць і викладачі для «Перекладача поколінь»</li>
+    </ul>
+  </div>
+</section>
+
+</div></div>
+<div id="nav"><button id="prev" aria-label="Назад">‹</button><span id="count"></span><button id="next" aria-label="Далі">›</button></div>
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const stage=document.getElementById('stage');
+function fit(){const s=Math.min(innerWidth/1320,innerHeight/760);stage.style.transform='scale('+s+')'}
+function show(n){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  document.getElementById('count').textContent=(i+1)+' / '+slides.length;
+  document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+  try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
+document.getElementById('prev').onclick=()=>show(i-1);
+document.getElementById('next').onclick=()=>show(i+1);
+addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1)}if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);if(e.key==='Home')show(0);if(e.key==='End')show(slides.length-1)});
+let tx=null;addEventListener('touchstart',e=>tx=e.touches[0].clientX);addEventListener('touchend',e=>{if(tx===null)return;const d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>50)show(i+(d<0?1:-1));tx=null});
+addEventListener('resize',fit);fit();
+show((parseInt(location.hash.slice(1))||1)-1);
+</script>
+</body>
+</html>
